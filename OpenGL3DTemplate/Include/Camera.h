@@ -1,3 +1,4 @@
+#pragma once
 class Camera {
 public:
     // Variables to control the view

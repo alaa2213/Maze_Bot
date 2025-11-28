@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "Include/Camera.h"
 #include <cmath>
 #include <iostream>
 
@@ -12,7 +12,7 @@ Camera::Camera() {
     upX = 0.0f; upY = 1.0f; upZ = 0.0f;
 }
 
-[cite_start]// [cite: 32] Toggle between views
+// [cite: 32] Toggle between views
 void Camera::toggleMode() {
     isFirstPerson = !isFirstPerson;
     std::cout << "Camera Mode: " << (isFirstPerson ? "First Person" : "Third Person") << std::endl;
@@ -24,7 +24,7 @@ void Camera::update(float playerX, float playerY, float playerZ, float playerAng
     float angleRad = DEG2RAD(playerAngle);
 
     if (isFirstPerson) {
-        [cite_start]// --- FIRST PERSON [cite: 27] ---
+        // --- FIRST PERSON [cite: 27] ---
         // Camera is exactly at the player's eye level
         eyeX = playerX;
         eyeY = playerY + 1.0f; // +1.0 height for the "eye"
@@ -36,7 +36,7 @@ void Camera::update(float playerX, float playerY, float playerZ, float playerAng
         centerZ = eyeZ + cos(angleRad);
     }
     else {
-        [cite_start]// --- THIRD PERSON [cite: 28] ---
+       // --- THIRD PERSON [cite: 28] ---
         // Camera is behind and slightly above the player
         float distanceFromPlayer = 5.0f;
         float heightAbovePlayer = 3.0f;

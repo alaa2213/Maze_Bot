@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "Include/Player.h"
 #include <cmath> // Required for sin() and cos()
 #include <iostream>
 
@@ -13,10 +13,10 @@ Player::Player() {
 
     velocityY = 0.0f;
     isJumping = false;
-    lives = 5; [cite_start]// [cite: 10] Player starts with 5 lives
+    lives = 5; // [cite: 10] Player starts with 5 lives
 }
 
-[cite_start]// --- Movement Logic [cite: 30] ---
+// --- Movement Logic [cite: 30] ---
 
 void Player::moveForward() {
     // Move "Forward" relative to where the player is facing
@@ -42,7 +42,7 @@ void Player::turnRight() {
     angle -= rotateSpeed; // Rotate clockwise
 }
 
-[cite_start]// --- Jumping & Gravity Logic [cite: 31] ---
+// --- Jumping & Gravity Logic [cite: 31] ---
 
 void Player::jump() {
     // Only jump if we are currently on the ground
@@ -82,7 +82,7 @@ bool Player::checkCollision(float objX, float objZ, float objWidth, float objDep
         (z - playerSize <= objZ + objDepth);
 
     if (collisionX && collisionZ) {
-        [cite_start]// [cite: 39] Collision detected
+       // [cite: 39] Collision detected
         return true;
     }
     return false;

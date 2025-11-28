@@ -1,3 +1,4 @@
+#pragma once
 class Player {
 public:
     // Position & Orientation
@@ -27,4 +28,5 @@ public:
 
     // Getters for Camera to use
     float getX(); float getY(); float getZ();
+	void loseLife(); // Deduct a life
 };
