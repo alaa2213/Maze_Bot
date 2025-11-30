@@ -165,3 +165,132 @@ int main(int argc, char** argv) {
     glutMainLoop();
     return 0;
 }
+
+
+
+
+
+
+//MEMBER 3 FINAL TEST CODE
+
+#include <iostream>
+#include "glut.h"         
+#include "GameManager.h"   
+
+// GLOBAL VARIABLES
+GameManager game;
+int currentLevel = 1; // Tracks if we are in Day (1) or Night (2)
+
+// A simple object to test lighting on
+void drawTestObject() {
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, 0.0f);
+
+    // --- NEW: Make it SHINY ---
+    // This adds a white "hotspot" reflection so you can see the light move
+    GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat mat_shininess[] = { 50.0f };
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    // ---------------------------
+
+    glColor3f(1.0f, 0.0f, 0.0f); // Red Sphere
+    glutSolidSphere(1.0, 50, 50);
+    glPopMatrix();
+}
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+
+    // Camera Position: 5 units back, looking at center
+    gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
+    // 1. SETUP LIGHTS based on the current level variable
+    game.setupLights(currentLevel);
+
+    // Enable Color Material so the sphere stays Red even with lights on
+    glEnable(GL_COLOR_MATERIAL);
+
+    // Draw the 3D Sphere
+    drawTestObject();
+
+    // 2. DRAW HUD (Score/Lives) on top
+    game.renderHUD();
+
+    glutSwapBuffers();
+}
+
+void reshape(int w, int h) {
+    if (h == 0) h = 1;
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    // Standard 3D perspective
+    gluPerspective(60.0, (float)w / h, 0.1, 100.0);
+    glMatrixMode(GL_MODELVIEW);
+}
+
+void keyboard(unsigned char key, int x, int y) {
+    switch (key) {
+        // --- LIGHTING CONTROLS ---
+    case '1':
+        currentLevel = 1;
+        std::cout << "Level 1: Day (Static Light)\n";
+        break;
+    case '2':
+        currentLevel = 2;
+        std::cout << "Level 2: Night (Moving Light)\n";
+        break;
+
+        // --- AUDIO & LOGIC CONTROLS ---
+    case 'c': // Coin
+        game.handleInteraction("coin");
+        std::cout << "Action: Collected Coin\n";
+        break;
+    case 'w': // Wall
+        game.handleInteraction("wall");
+        std::cout << "Action: Hit Wall\n";
+        break;
+    case 'v': // Win
+        game.handleInteraction("win");
+        std::cout << "Action: You Win!\n";
+        break;
+
+    case 27: exit(0); break; // ESC to quit
+    }
+    glutPostRedisplay();
+}
+
+void idle() {
+    // Update the light animation angle
+    game.update();
+    glutPostRedisplay();
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(800, 600);
+    glutCreateWindow("Member 3 Final Test");
+
+    glEnable(GL_DEPTH_TEST);
+
+    // GREY BACKGROUND (So you can see the sphere clearly)
+    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    glutKeyboardFunc(keyboard);
+    glutIdleFunc(idle);
+
+    std::cout << "--- MEMBER 3 TEST CONTROLS ---\n";
+    std::cout << "[1] Switch to Level 1 (Day)\n";
+    std::cout << "[2] Switch to Level 2 (Night + Moving Light)\n";
+    std::cout << "[C] Collect Coin\n";
+    std::cout << "[W] Hit Wall\n";
+    std::cout << "------------------------------\n";
+
+    glutMainLoop();
+    return 0;
+}
