@@ -38,11 +38,11 @@ void Camera::update(float playerX, float playerY, float playerZ, float playerAng
     else {
        // --- THIRD PERSON [cite: 28] ---
         // Camera is behind and slightly above the player
-        float distanceFromPlayer = 5.0f;
-        float heightAbovePlayer = 3.0f;
+       // In Camera.cpp -> update() function
+// Make sure this number is big enough (e.g., 5.0f, 10.0f)
+        float distanceFromPlayer = 8.0f; // <--- Increase this if zoomed in!
+        float heightAbovePlayer = 4.0f;  // <--- Increase this to look down more
 
-        // Calculate position "behind" the player
-        // We subtract sin/cos to go opposite to the facing direction
         eyeX = playerX - (distanceFromPlayer * sin(angleRad));
         eyeY = playerY + heightAbovePlayer;
         eyeZ = playerZ - (distanceFromPlayer * cos(angleRad));
