@@ -166,12 +166,16 @@
 #include "GameManager.h"   
 #include "Include/Model_3DS.h"
 #include "Include/Player.h" // Include the Player class
-
+#include "Include/Camera.h"
+#include "Include/level.h"
 // --- Game Objects ---
 Player player; // The object that will handle movement and collision logic
 Model_3DS robocopModel;
+Camera camera;
 Model_3DS wallModel;
 Model_3DS doorModel;
+Model_3DS coinModel;
+Level level;
 
 // GLOBAL VARIABLES
 GameManager game;
@@ -179,35 +183,48 @@ int currentLevel = 1; // Tracks if we are in Day (1) or Night (2)
 
 // --- Obstacle Positions ---
 // Array to hold the positions of our 3 wall obstacles
-float wallPositions[3][2] = {
+float wallPositions[5][2] = {
     {0.0f, -5.0f},  // Wall 1
     {-4.0f, 2.0f},   // Wall 2
-    {4.0f, 2.0f}    // Wall 3
+    {4.0f, 4.0f} ,// Wall 3
+    { 2.0f , 5.0f},
+    {6.0f , 7.0f}
 };
 
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
+	
+	 // Load coins and walls
+    camera.update(player.x, player.y, player.z, player.angle);
 
-    // Camera: High Angle "Top Down" view that follows the player
-    gluLookAt(player.x, 15.0, player.z + 10, // Eye position (follows player)
-              player.x, 0.0, player.z,      // Center position (looks at player)
-              0.0, 1.0, 0.0);                // Up vector
-
+    gluLookAt(camera.eyeX, camera.eyeY, camera.eyeZ,
+        camera.centerX, camera.centerY, camera.centerZ,
+        camera.upX, camera.upY, camera.upZ);
+    level.draw();
+	
     // 1. LIGHTING
     game.setupLights(currentLevel);
 
     // 2. DRAW PLAYER (at the Player object's position)
-    glEnable(GL_COLOR_MATERIAL);
+   /* glEnable(GL_COLOR_MATERIAL);
     glPushMatrix();
     glTranslatef(player.x, player.y, player.z);
     glRotatef(player.angle, 0.0f, 1.0f, 0.0f);
     robocopModel.Draw();
-    glPopMatrix();
+    glPopMatrix();*/
+    if (!camera.isFirstPerson) {
+        glEnable(GL_COLOR_MATERIAL);
+        glPushMatrix();
+        glTranslatef(player.x, player.y, player.z);
+        glRotatef(player.angle, 0.0f, 1.0f, 0.0f);
+		robocopModel.Draw();
+        glPopMatrix();
+    }
 
     // 3. DRAW OBSTACLE WALLS
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 5; ++i) {
         glPushMatrix();
         glTranslatef(wallPositions[i][0], 0.0f, wallPositions[i][1]);
         wallModel.Draw();
@@ -226,6 +243,12 @@ void display() {
 
     glutSwapBuffers();
 }
+void specialKeys(int key, int x, int y) {
+    if (key == GLUT_KEY_UP) {
+        camera.toggleMode();
+    }
+    glutPostRedisplay();
+}
 
 void reshape(int w, int h) {
     if (h == 0) h = 1;
@@ -235,6 +258,14 @@ void reshape(int w, int h) {
     // Standard 3D perspective
     gluPerspective(60.0, (float)w / h, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
+}
+void timer(int val) {
+    player.updatePhysics();
+    int coinsFound = level.checkCoinCollisions(player.x, player.z, 0.5f);
+    level.update(0.016f);
+    glutPostRedisplay();
+
+    glutTimerFunc(16, timer, 0);
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -260,19 +291,23 @@ void keyboard(unsigned char key, int x, int y) {
 
     // --- COLLISION DETECTION ---
     // After moving, check if the player has collided with any wall
+    bool hasCollided = false;
     for (int i = 0; i < 3; ++i) {
         // checkCollision(wallX, wallZ, wallHalfWidth, wallHalfDepth)
         // We use 1.0f for half-width/depth as a generous bounding box for the wall model
         if (player.checkCollision(wallPositions[i][0], wallPositions[i][1], 1.0f, 1.0f)) {
-            player.x = oldX; // Revert position to before the move
-            player.z = oldZ;
-            
-            // This handles BOTH life deduction AND sound playback
-            game.handleInteraction("wall"); 
-            
+            hasCollided = true;
             std::cout << "Collision with wall " << i + 1 << "!\n";
             break; // Exit loop after one collision
         }
+    }
+
+    if (hasCollided) {
+        player.x = oldX; // Revert position to before the move
+        player.z = oldZ;
+
+        // This handles BOTH life deduction AND sound playback
+        game.handleInteraction("wall");
     }
 
     glutPostRedisplay();
@@ -288,13 +323,15 @@ int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(800, 600);
-    glutCreateWindow("Member 3 Final Test");
+  glutCreateWindow("Member 3 Final Test");
+   glutSpecialFunc(specialKeys);
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // Grey background
-    
+    level.loadAssets();
     // --- LOAD ROBOCOP ---
     robocopModel.Load((char*)"robocop.3ds");
+    robocopModel.scale = 0.1f; 
     robocopModel.scale = 0.1f; 
 
     // --- LOAD WALL ---
@@ -309,7 +346,9 @@ int main(int argc, char** argv) {
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
+   
     glutIdleFunc(idle);
+	glutTimerFunc(0, timer, 0);
 
     std::cout << "--- MEMBER 3 TEST CONTROLS ---\n";
     std::cout << "[W,A,S,D] to Move | [Space] to Jump\n";

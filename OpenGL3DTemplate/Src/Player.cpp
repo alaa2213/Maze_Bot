@@ -1,6 +1,7 @@
 #include "Include/Player.h"
 #include <cmath> // Required for sin() and cos()
 #include <iostream>
+#include <algorithm> // Required for std::max and std::min
 
 #define DEG2RAD(a) (a * 0.0174532925)
 
@@ -33,13 +34,26 @@ void Player::moveBackward() {
 }
 
 void Player::turnLeft() {
+    // Rotate left
     float rotateSpeed = 5.0f;
-    angle += rotateSpeed; // Rotate counter-clockwise
+    angle += rotateSpeed;
+
+    // Move forward in the new direction
+    float speed = 0.1f;
+    x += speed * sin(DEG2RAD(angle));
+    z += speed * cos(DEG2RAD(angle));
 }
 
+
 void Player::turnRight() {
+    // Rotate right
     float rotateSpeed = 5.0f;
-    angle -= rotateSpeed; // Rotate clockwise
+    angle -= rotateSpeed;
+
+    // Move forward in the new direction
+    float speed = 0.1f;
+    x += speed * sin(DEG2RAD(angle));
+    z += speed * cos(DEG2RAD(angle));
 }
 
 // --- Jumping & Gravity Logic [cite: 31] ---
@@ -67,24 +81,28 @@ void Player::updatePhysics() {
     }
 }
 
-// --- Collision Logic (AABB) ---
-// Returns TRUE if the player hits a bounding box (like a wall)
+// --- Collision Logic (Circle-AABB) ---
+// Returns TRUE if the player's bounding circle hits a bounding box (like a wall)
 bool Player::checkCollision(float objX, float objZ, float objWidth, float objDepth) {
-    // Player's size (assumed small robot)
-    float playerSize = 0.5f;
+    // Player's bounding circle radius. Adjust if needed to fit your model.
+    float playerRadius = 0.5f;
 
-    // Check overlap on X axis
-    bool collisionX = (x + playerSize >= objX - objWidth) &&
-        (x - playerSize <= objX + objWidth);
+    // Find the closest point on the wall's AABB to the center of the player's circle
+    float closestX = std::max(objX - objWidth, std::min(x, objX + objWidth));
+    float closestZ = std::max(objZ - objDepth, std::min(z, objZ + objDepth));
 
-    // Check overlap on Z axis
-    bool collisionZ = (z + playerSize >= objZ - objDepth) &&
-        (z - playerSize <= objZ + objDepth);
+    // Calculate the distance between the circle's center and this closest point
+    float distanceX = x - closestX;
+    float distanceZ = z - closestZ;
+    float distanceSquared = (distanceX * distanceX) + (distanceZ * distanceZ);
 
-    if (collisionX && collisionZ) {
-       // [cite: 39] Collision detected
+    // If the distance is less than the circle's radius, a collision occurs.
+    // We use squared values to avoid a costly square root operation.
+    if (distanceSquared < (playerRadius * playerRadius)) {
+        // [cite: 39] Collision detected
         return true;
     }
+
     return false;
 }
 
