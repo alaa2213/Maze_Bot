@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+
 class Player {
 public:
     // Position & Orientation
@@ -25,8 +27,18 @@ public:
     // Collision Logic
     // Takes the coordinates of a wall to check if we hit it
     bool checkCollision(float wallX, float wallZ, float wallWidth, float wallDepth);
+    // Check if a specific position would cause a collision
+    bool wouldCollideAt(float testX, float testZ, float wallX, float wallZ, float wallWidth, float wallDepth);
 
     // Getters for Camera to use
     float getX(); float getY(); float getZ();
-	void loseLife(); // Deduct a life
+    void loseLife(); // Deduct a life
+
+    void addWall(float wallX, float wallZ, float wallWidth, float wallDepth);
+
+private:
+    struct Wall {
+        float x, z, width, depth;
+    };
+    std::vector<Wall> walls;
 };

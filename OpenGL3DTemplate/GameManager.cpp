@@ -33,9 +33,9 @@ void GameManager::setupLights(int levelNumber) {
 
         glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
-        // Color: Dim Blue Cave Light
-        GLfloat ambient[] = { 0.1f, 0.1f, 0.1f, 1.0f };
-        GLfloat diffuse[] = { 0.0f, 0.0f, 0.8f, 1.0f };
+        // Color: Brighter Blue Cave Light
+        GLfloat ambient[] = { 0.4f, 0.4f, 0.5f, 1.0f };
+        GLfloat diffuse[] = { 0.3f, 0.3f, 1.0f, 1.0f };
         glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
         glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
     }
@@ -47,8 +47,8 @@ void GameManager::setupLights(int levelNumber) {
 
         glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
-        // Color: Bright White Daylight
-        GLfloat ambient[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+        // Color: Very Bright White Daylight
+        GLfloat ambient[] = { 0.8f, 0.8f, 0.8f, 1.0f };
         GLfloat diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
         glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
         glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);

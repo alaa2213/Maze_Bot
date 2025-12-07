@@ -86,21 +86,22 @@
     <None Include="wall.3ds" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Users\sevin\Downloads\Lab 7\GLTexture.cpp" />
-    <ClCompile Include="..\..\..\..\Users\sevin\Downloads\Lab 7\Model_3DS.cpp" />
+    <ClCompile Include="..\..\Downloads\level.cpp" />
     <ClCompile Include="GameManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="OpenGL3DTemplate.cpp" />
     <ClCompile Include="Src\Camera.cpp" />
+    <ClCompile Include="Src\GLTexture.cpp" />
+    <ClCompile Include="Src\Model_3DS.cpp" />
     <ClCompile Include="Src\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\Users\sevin\Downloads\Lab 7\GLTexture.h" />
     <ClInclude Include="..\..\..\..\Users\sevin\Downloads\Lab 7\Model_3DS.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Include\Camera.h" />
+    <ClInclude Include="Include\GLTexture.h" />
     <ClInclude Include="Include\Player.h" />
   </ItemGroup>
   <ItemGroup>

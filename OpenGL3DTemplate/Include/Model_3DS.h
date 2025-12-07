@@ -95,7 +95,8 @@ public:
 		float y;
 		float z;
 	};
-
+	float min_x, max_x, min_y, max_y, min_z, max_z;
+	void ComputeBounds();
 	// Color struct holds the diffuse color of the material
 	struct Color4i {
 		unsigned char r;
