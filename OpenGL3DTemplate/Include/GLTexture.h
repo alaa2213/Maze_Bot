@@ -11,7 +11,8 @@ public:
     unsigned int texture[1];
     int width;
     int height;
-
+    // Add these public members
+  
     GLTexture();
     virtual ~GLTexture();
 

@@ -18,6 +18,16 @@ void Camera::toggleMode() {
     std::cout << "Camera Mode: " << (isFirstPerson ? "First Person" : "Third Person") << std::endl;
 }
 
+// Set camera to First Person mode
+void Camera::setFirstPerson() {
+    isFirstPerson = true;
+}
+
+// Set camera to Third Person mode
+void Camera::setThirdPerson() {
+    isFirstPerson = false;
+}
+
 // Calculates where the camera should be based on player position
 void Camera::update(float playerX, float playerY, float playerZ, float playerAngle) {
 

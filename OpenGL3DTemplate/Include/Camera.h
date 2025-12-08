@@ -18,4 +18,8 @@ public:
 
     // Call this when user presses Arrow Keys [cite: 32]
     void toggleMode();
+    
+    // Set specific camera modes
+    void setFirstPerson();
+    void setThirdPerson();
 };

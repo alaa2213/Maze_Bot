@@ -1,4 +1,4 @@
-#include "level.h"
+#include "Include/level.h"
 #include <glut.h>
 
 Level::Level() {
@@ -6,7 +6,10 @@ Level::Level() {
     hoverTime = 0.0f;
     // Set portal position at far end of Level 2
     portalX = 0.0f;
-    portalZ = -10.0f; // Far end (opposite from spawn at z=8)
+    portalZ = -14.0f; // Further back for wider maze
+    
+    // Initialize snow particles for Level 2
+    initSnow();
 }
 
 void Level::loadAssets() {
@@ -24,31 +27,44 @@ void Level::loadAssets() {
     iceWallModel.scale = 0.3f;
     
     portalModel.Load((char*)"portal.3ds");
-    portalModel.scale = 0.1f;
+    portalModel.scale = 0.05f; // Increased from 0.05f to 0.15f for better texture mapping
     
-    // Place coins for Level 1
+    // Place coins for Level 1 - scattered throughout the level
     for (int i = 0; i < 10; i++) {
         float zPosition = -(i * 2.0f);
         float xOffset = rand() % 5 - 2;
         coins.push_back({ xOffset, zPosition, true });
     }
     
-    // Place multiple vases in Level 2
-    addVase(-6.0f, -6.0f);
-    addVase(6.0f, -6.0f);
-    addVase(-6.0f, 6.0f);
-    addVase(6.0f, 6.0f);
-    addVase(-3.0f, -3.0f);
-    addVase(3.0f, -3.0f);
-    addVase(-3.0f, 3.0f);
-    addVase(3.0f, 3.0f);
+    // Place vases in Level 2 - in open areas away from walls for better visibility
+    // Positioned strategically in safe, visible zones for WIDER maze
+    addVase(-5.0f, 7.0f);    // Top left - safe zone
+    addVase(5.0f, 7.0f);     // Top right - safe zone
+    addVase(-2.0f, 5.0f);    // Upper middle left
+    addVase(2.0f, 5.0f);     // Upper middle right
+    addVase(-5.0f, 1.0f);    // Middle left corridor
+    addVase(5.0f, 1.0f);     // Middle right corridor
+    addVase(-2.0f, -2.0f);   // Lower middle left
+    addVase(2.0f, -2.0f);    // Lower middle right
+    addVase(-5.0f, -6.0f);   // Bottom left
+    addVase(5.0f, -6.0f);    // Bottom right
+    addVase(0.0f, 3.0f);     // Center open area
+    addVase(-3.0f, -11.0f);  // Near portal left
+    addVase(3.0f, -11.0f);   // Near portal right
+    addVase(0.0f, -3.0f);    // Center lower area
 }
 
 // Call this function from your main timer/idle loop
 void Level::update(float deltaTime) {
-    rotationAngle += 90.0f * deltaTime;
+    // Update rotation angle for door and portal
+    rotationAngle += 45.0f * deltaTime; // 45 degrees per second
     if (rotationAngle > 360.0f) rotationAngle -= 360.0f;
+    
+    // Update hover time for scaling effect
     hoverTime += deltaTime * 2.0f;
+    
+    // Update snow particles
+    updateSnow(deltaTime);
 }
 
 void Level::draw() {
@@ -62,61 +78,172 @@ void Level::draw() {
     glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 
+    // Draw Level 1 ground (grass/outdoor theme)
+    drawGroundLevel1();
+
+    // Draw coins with scaling animation
     for (Coin& c : coins) {
         if (c.isActive) {
             glPushMatrix();
+            
+            // Position with hover effect
             float hoverHeight = 0.5f + (0.2f * sin(hoverTime));
             glTranslatef(c.x, hoverHeight, c.z);
-            glRotatef(rotationAngle, 0.0f, 1.0f, 0.0f);
-            float scaleFactor = 0.06f;
+            
+            // Scale up and down using sine wave
+            float scaleVariation = 0.02f * sin(hoverTime);
+            float scaleFactor = 0.06f + scaleVariation;
             glScalef(scaleFactor, scaleFactor, scaleFactor);
+            
             coinModel.Draw();
             glPopMatrix();
         }
     }
 }
 
+// Draw Level 1 ground - grass/outdoor theme
+void Level::drawGroundLevel1() {
+    glDisable(GL_LIGHTING);
+    
+    // Draw a textured ground plane (greenish for grass)
+    glColor3f(0.2f, 0.6f, 0.2f); // Green grass color
+    glBegin(GL_QUADS);
+    glVertex3f(-50.0f, 0.0f, -50.0f);
+    glVertex3f(50.0f, 0.0f, -50.0f);
+    glVertex3f(50.0f, 0.0f, 50.0f);
+    glVertex3f(-50.0f, 0.0f, 50.0f);
+    glEnd();
+    
+    // Draw grid lines for better depth perception
+    glColor3f(0.15f, 0.5f, 0.15f); // Darker green for grid
+    glBegin(GL_LINES);
+    for (float i = -50; i <= 50; i += 2.0f) {
+        glVertex3f(i, 0.01f, -50); 
+        glVertex3f(i, 0.01f, 50);
+        glVertex3f(-50, 0.01f, i); 
+        glVertex3f(50, 0.01f, i);
+    }
+    glEnd();
+    
+    glEnable(GL_LIGHTING);
+}
+
+// Draw Level 2 ground - ice/cave theme
+void Level::drawGroundLevel2() {
+    glDisable(GL_LIGHTING);
+    
+    // Draw an icy ground plane (brighter bluish-white for fresh snow/ice)
+    glColor3f(0.85f, 0.92f, 0.98f); // Brighter snow-white with blue tint
+    glBegin(GL_QUADS);
+    glVertex3f(-50.0f, 0.0f, -50.0f);
+    glVertex3f(50.0f, 0.0f, -50.0f);
+    glVertex3f(50.0f, 0.0f, 50.0f);
+    glVertex3f(-50.0f, 0.0f, 50.0f);
+    glEnd();
+    
+    // Draw grid lines with icy crystalline blue color
+    glColor3f(0.6f, 0.75f, 0.9f); // Crystalline ice blue for grid
+    glBegin(GL_LINES);
+    for (float i = -50; i <= 50; i += 2.0f) {
+        glVertex3f(i, 0.01f, -50); 
+        glVertex3f(i, 0.01f, 50);
+        glVertex3f(-50, 0.01f, i); 
+        glVertex3f(50, 0.01f, i);
+    }
+    glEnd();
+    
+    glEnable(GL_LIGHTING);
+}
+
 // Draw Level 2 specific objects INCLUDING ice walls
 void Level::drawLevel2Objects() {
     glEnable(GL_COLOR_MATERIAL);
     
-    // Draw all active vases
+    // Draw Level 2 ground first
+    drawGroundLevel2();
+    
+    // Draw falling snow for atmospheric effect
+    drawSnow();
+    
+    // Draw all active vases with scaling AND hover animation for better visibility
     for (Vase& v : vases) {
         if (v.isActive) {
             glPushMatrix();
-            glTranslatef(v.x, 0.0f, v.z);
-            glRotatef(rotationAngle * 0.5f, 0.0f, 1.0f, 0.0f);
-            glScalef(0.1f, 0.1f, 0.1f);
+            
+            // Add hover effect like coins for better visibility
+            float hoverHeight = 0.5f + (0.15f * sin(hoverTime + 0.5f)); // Slightly different phase
+            glTranslatef(v.x, hoverHeight, v.z);
+            
+            // Scale up and down using sine wave (slightly different phase than coins)
+            float scaleVariation = 0.03f * sin(hoverTime + 1.0f); // Larger variation for visibility
+            float scaleFactor = 0.12f + scaleVariation; // Larger base scale
+            glScalef(scaleFactor, scaleFactor, scaleFactor);
+            
             vaseModel.Draw();
             glPopMatrix();
         }
     }
     
-    // Draw Ice blocks
+    // Draw decorative Ice blocks (non-collidable) - more spread out
     glPushMatrix();
-    glTranslatef(3.0f, 0.0f, -3.0f);
+    glTranslatef(5.0f, 0.0f, -6.0f);
     glScalef(0.15f, 0.15f, 0.15f);
     iceModel.Draw();
     glPopMatrix();
     
     glPushMatrix();
-    glTranslatef(-3.0f, 0.0f, 3.0f);
+    glTranslatef(-5.0f, 0.0f, 4.0f);
     glScalef(0.15f, 0.15f, 0.15f);
     iceModel.Draw();
     glPopMatrix();
     
     glPushMatrix();
-    glTranslatef(3.0f, 0.0f, 3.0f);
+    glTranslatef(5.5f, 0.0f, 5.0f);
     glScalef(0.15f, 0.15f, 0.15f);
     iceModel.Draw();
     glPopMatrix();
     
-    // DRAW PORTAL AT FAR END (FIXED - NO ANIMATION)
     glPushMatrix();
-    glTranslatef(portalX, 1.0f, portalZ); // No hover, no rotation
-    glScalef(0.2f, 0.2f, 0.2f); // Larger for visibility
+    glTranslatef(-5.5f, 0.0f, -2.0f);
+    glScalef(0.15f, 0.15f, 0.15f);
+    iceModel.Draw();
+    glPopMatrix();
+    
+    // DRAW PORTAL WITH ROTATION and proper texture settings
+    glPushMatrix();
+    
+    // Enable texturing for the portal
+    glEnable(GL_TEXTURE_2D);
+    
+    // Set material properties for better texture visibility
+    GLfloat portalMat_ambient[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+    GLfloat portalMat_diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat portalMat_specular[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+    GLfloat portalMat_shininess[] = { 32.0f };
+    
+    glMaterialfv(GL_FRONT, GL_AMBIENT, portalMat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, portalMat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, portalMat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, portalMat_shininess);
+    
+    glTranslatef(portalX, 1.0f, portalZ);
+    glRotatef(rotationAngle, 0.0f, 1.0f, 0.0f); // Rotate around Y-axis
+    glScalef(0.15f, 0.15f, 0.15f); // Updated scale for better texture display
+    
     portalModel.Draw();
+    
     glPopMatrix();
+}
+
+// Draw door with rotation
+void Level::drawDoor(Model_3DS& doorModel, float x, float y, float z) {
+    if (doorModel.visible && doorModel.numObjects > 0) {
+        glPushMatrix();
+        glTranslatef(x, y, z);
+        glRotatef(rotationAngle, 0.0f, 1.0f, 0.0f); // Rotate around Y-axis
+        doorModel.Draw();
+        glPopMatrix();
+    }
 }
 
 void Level::addWall(float x, float z) {
@@ -211,6 +338,67 @@ float Level::getPortalX() {
 float Level::getPortalZ() {
     return portalZ;
 }
+
+// Initialize snow particles for Level 2
+void Level::initSnow() {
+    snowflakes.clear();
+    // Create 200 snowflakes
+    for (int i = 0; i < 200; i++) {
+        Snowflake snow;
+        // Random position across the level
+        snow.x = -30.0f + (rand() % 60);
+        snow.y = (rand() % 30);
+        snow.z = -30.0f + (rand() % 60);
+        // Random fall speed
+        snow.speed = 0.5f + (rand() % 100) / 200.0f;
+        // Random size
+        snow.size = 0.05f + (rand() % 50) / 1000.0f;
+        snowflakes.push_back(snow);
+    }
+}
+
+// Update snow particle positions
+void Level::updateSnow(float deltaTime) {
+    for (Snowflake& snow : snowflakes) {
+        // Make snow fall down
+        snow.y -= snow.speed * deltaTime * 10.0f;
+        
+        // Add gentle horizontal drift for realism
+        snow.x += sin(snow.y * 0.5f) * deltaTime * 0.5f;
+        
+        // Reset snowflake to top when it reaches ground
+        if (snow.y < 0.0f) {
+            snow.y = 30.0f;
+            snow.x = -30.0f + (rand() % 60);
+            snow.z = -30.0f + (rand() % 60);
+        }
+    }
+}
+
+// Draw falling snow particles
+void Level::drawSnow() {
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    glColor4f(1.0f, 1.0f, 1.0f, 0.8f); // White with slight transparency
+    
+    glPointSize(2.0f);
+    glBegin(GL_POINTS);
+    for (const Snowflake& snow : snowflakes) {
+        glVertex3f(snow.x, snow.y, snow.z);
+    }
+    glEnd();
+    
+    glDisable(GL_BLEND);
+    glEnable(GL_LIGHTING);
+}
+
+
+
+
+
+
 
 
 

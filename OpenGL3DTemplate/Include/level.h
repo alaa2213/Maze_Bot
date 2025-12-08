@@ -19,6 +19,13 @@ struct Vase {
     bool isActive; // If false, the vase is collected (hidden)
 };
 
+// Snowflake particle for Level 2 atmosphere
+struct Snowflake {
+    float x, y, z;
+    float speed;
+    float size;
+};
+
 class Level {
 public:
     Model_3DS coinModel;
@@ -34,14 +41,17 @@ public:
 
     // Vector to store multiple vases
     std::vector<Vase> vases;
+    
+    // Snow particles for Level 2
+    std::vector<Snowflake> snowflakes;
 
     // Portal position (target in Level 2)
     float portalX;
     float portalZ;
 
     // Animation Variables
-    float rotationAngle; // 0 to 360 degrees
-    float hoverTime;     // Used for the bobbing up/down effect
+    float rotationAngle; // 0 to 360 degrees - used for door and portal rotation
+    float hoverTime;     // Used for the scaling up/down effect
     
     int checkCoinCollisions(float playerX, float playerZ, float playerRadius);
     int checkVaseCollisions(float playerX, float playerZ, float playerRadius);
@@ -51,6 +61,12 @@ public:
     void update(float deltaTime); // Calculates new angle/height
     void draw();
     void drawLevel2Objects(); // Draw Level 2 specific objects
+    void drawDoor(Model_3DS& doorModel, float x, float y, float z); // Draw rotating door
+    void drawGroundLevel1(); // Draw Level 1 ground
+    void drawGroundLevel2(); // Draw Level 2 ground
+    void drawSnow(); // Draw falling snow particles
+    void initSnow(); // Initialize snow particles
+    void updateSnow(float deltaTime); // Update snow positions
     void addWall(float x, float z);
     void addVase(float x, float z); // Helper to add vases
 
