@@ -27,14 +27,35 @@ void Level::loadAssets() {
     iceWallModel.scale = 0.3f;
     
     portalModel.Load((char*)"portal.3ds");
-    portalModel.scale = 0.05f; // Increased from 0.05f to 0.15f for better texture mapping
+    portalModel.scale = 0.05f;
     
-    // Place coins for Level 1 - scattered throughout the level
-    for (int i = 0; i < 10; i++) {
-        float zPosition = -(i * 2.0f);
-        float xOffset = rand() % 5 - 2;
-        coins.push_back({ xOffset, zPosition, true });
-    }
+    // Place coins for Level 1 - optimized for WIDER maze with 10 walls
+    // Player spawns at (0, 10) and door is at (1, -12)
+    
+    // Starting area - wide open
+    addCoin(0.0f, 9.0f);      // Center at spawn
+    addCoin(-5.0f, 8.0f);     // Left side
+    addCoin(5.0f, 8.0f);      // Right side
+    
+    // Upper section - wide corridors
+    addCoin(-6.0f, 4.5f);     // Left corridor
+    addCoin(0.0f, 5.0f);      // Center path
+    addCoin(6.0f, 4.5f);      // Right corridor
+    
+    // Middle section - open center
+    addCoin(-5.0f, 0.0f);     // Left middle
+    addCoin(0.0f, 0.0f);      // Center middle
+    addCoin(5.0f, 0.0f);      // Right middle
+    
+    // Lower section - wide approach to door
+    addCoin(-6.0f, -4.5f);    // Lower left
+    addCoin(0.0f, -5.0f);     // Center lower
+    addCoin(6.0f, -4.5f);     // Lower right
+    
+    // Final approach to door
+    addCoin(0.0f, -8.0f);     // Near door center
+    addCoin(-2.0f, -10.0f);   // Left of door
+    addCoin(2.0f, -10.0f);    // Right of door
     
     // Place vases in Level 2 - in open areas away from walls for better visibility
     // Positioned strategically in safe, visible zones for WIDER maze
@@ -81,19 +102,30 @@ void Level::draw() {
     // Draw Level 1 ground (grass/outdoor theme)
     drawGroundLevel1();
 
-    // Draw coins with scaling animation
+    // Draw coins with enhanced visibility - larger size, higher hover, and glow effect
     for (Coin& c : coins) {
         if (c.isActive) {
             glPushMatrix();
             
-            // Position with hover effect
-            float hoverHeight = 0.5f + (0.2f * sin(hoverTime));
+            // Position with more prominent hover effect
+            float hoverHeight = 0.7f + (0.3f * sin(hoverTime)); // Increased from 0.5 + 0.2
             glTranslatef(c.x, hoverHeight, c.z);
             
-            // Scale up and down using sine wave
-            float scaleVariation = 0.02f * sin(hoverTime);
-            float scaleFactor = 0.06f + scaleVariation;
+            // Larger scale for better visibility
+            float scaleVariation = 0.03f * sin(hoverTime); // Increased from 0.02
+            float scaleFactor = 0.09f + scaleVariation; // Increased from 0.06
             glScalef(scaleFactor, scaleFactor, scaleFactor);
+            
+            // Enhanced golden material for better visibility
+            GLfloat coinMat_ambient[] = { 0.4f, 0.35f, 0.1f, 1.0f };
+            GLfloat coinMat_diffuse[] = { 1.0f, 0.9f, 0.3f, 1.0f }; // Brighter gold
+            GLfloat coinMat_specular[] = { 1.0f, 1.0f, 0.8f, 1.0f };
+            GLfloat coinMat_shininess[] = { 80.0f };
+            
+            glMaterialfv(GL_FRONT, GL_AMBIENT, coinMat_ambient);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, coinMat_diffuse);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, coinMat_specular);
+            glMaterialfv(GL_FRONT, GL_SHININESS, coinMat_shininess);
             
             coinModel.Draw();
             glPopMatrix();

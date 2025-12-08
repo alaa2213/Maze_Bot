@@ -22,7 +22,7 @@ void GameManager::setupLights(int levelNumber) {
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
-    // --- LEVEL 2: DARK NIGHT/CAVE WITH MOVING BLUE POINT LIGHT ---
+    // --- LEVEL 2: DARK NIGHT/CAVE WITH MOVING BABY BLUE POINT LIGHT ---
     if (levelNumber == 2) {
         // Point Light (w = 1.0f) - shines from a specific spot, creating a night/cave atmosphere
         glPushMatrix();
@@ -36,10 +36,10 @@ void GameManager::setupLights(int levelNumber) {
         
         glPopMatrix();
 
-        // Dark night/cave lighting - dim blue-tinted colors
-        GLfloat ambient[] = { 0.05f, 0.05f, 0.15f, 1.0f }; // Very dark blue ambient (night sky)
-        GLfloat diffuse[] = { 0.2f, 0.3f, 0.8f, 1.0f }; // Blue-tinted diffuse (moonlight effect)
-        GLfloat specular[] = { 0.3f, 0.4f, 1.0f, 1.0f }; // Blue specular highlights (ice reflections)
+        // Baby blue lighting - soft, light blue colors
+        GLfloat ambient[] = { 0.3f, 0.5f, 0.7f, 1.0f }; // Baby blue ambient
+        GLfloat diffuse[] = { 0.54f, 0.81f, 0.94f, 1.0f }; // Baby blue diffuse (main baby blue color)
+        GLfloat specular[] = { 0.7f, 0.9f, 1.0f, 1.0f }; // Light blue specular highlights
         
         glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
         glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
@@ -105,6 +105,33 @@ void GameManager::update() {
 }
 
 // 3. UI / HUD RENDERING
+// Helper function to draw a heart shape
+void GameManager::drawHeart(float x, float y, float size) {
+    glPushMatrix();
+    glTranslatef(x, y, 0.0f);
+    
+    // Draw heart shape using triangles and circles
+    glBegin(GL_TRIANGLE_FAN);
+    // Center bottom point of heart
+    glVertex2f(0.0f, -size * 0.5f);
+    
+    // Right side of heart
+    glVertex2f(size * 0.35f, 0.0f);
+    glVertex2f(size * 0.5f, size * 0.2f);
+    glVertex2f(size * 0.4f, size * 0.4f);
+    glVertex2f(size * 0.2f, size * 0.5f);
+    glVertex2f(0.0f, size * 0.3f);
+    
+    // Left side of heart
+    glVertex2f(-size * 0.2f, size * 0.5f);
+    glVertex2f(-size * 0.4f, size * 0.4f);
+    glVertex2f(-size * 0.5f, size * 0.2f);
+    glVertex2f(-size * 0.35f, 0.0f);
+    glEnd();
+    
+    glPopMatrix();
+}
+
 void GameManager::renderHUD() {
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -144,22 +171,27 @@ void GameManager::renderHUD() {
             glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
         }
     } else {
-        // Display Score and Lives only during gameplay (white text)
+        // Display Score (Top Left - white text)
         glColor3f(1.0f, 1.0f, 1.0f);
         
         std::string scoreStr = "Score: " + std::to_string(score);
-        std::string livesStr = "Lives: " + std::to_string(lives);
 
-        // Score (Top Left)
         glRasterPos2i(10, 580);
         for (char c : scoreStr) {
             glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
         }
 
-        // Lives (Top Right)
-        glRasterPos2i(700, 580);
-        for (char c : livesStr) {
-            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+        // Display Lives as Hearts (Top Right - red hearts)
+        glColor3f(1.0f, 0.0f, 0.0f); // Red color for hearts
+        
+        float heartSize = 15.0f;
+        float heartSpacing = 25.0f;
+        float startX = 700.0f;
+        float startY = 575.0f;
+        
+        // Draw hearts for each life
+        for (int i = 0; i < lives; i++) {
+            drawHeart(startX + (i * heartSpacing), startY, heartSize);
         }
     }
 

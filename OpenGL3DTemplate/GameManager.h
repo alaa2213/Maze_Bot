@@ -18,6 +18,9 @@ private:
     float lightAngle;
     float movingLightPos; // Position for the back-and-forth light
 
+    // Helper method to draw a heart shape
+    void drawHeart(float x, float y, float size);
+
 public:
     // Constructor
     GameManager();

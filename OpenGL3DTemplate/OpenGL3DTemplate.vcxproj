@@ -80,6 +80,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\..\Downloads\DIAMOND.3ds" />
+    <None Include="..\..\Downloads\goldCoin.3ds" />
     <None Include="door.3DS" />
     <None Include="portal.3DS" />
     <None Include="ReadMe.txt" />
