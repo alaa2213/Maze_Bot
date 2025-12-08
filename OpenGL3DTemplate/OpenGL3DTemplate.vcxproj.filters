@@ -11,6 +11,9 @@
     <None Include="door.3DS">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="..\..\Downloads\wall (2).3ds">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -62,13 +65,16 @@
     <Image Include="RoboCop Toy 051023.bmp">
       <Filter>Source Files</Filter>
     </Image>
-    <Image Include="Marble_W.bmp">
-      <Filter>Source Files</Filter>
-    </Image>
     <Image Include="sandston.bmp">
       <Filter>Source Files</Filter>
     </Image>
     <Image Include="sandstone bump.bmp">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="..\..\Downloads\a930b1cae0753d21f0ac715976d2b8c0\Marble_W.bmp">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="..\..\Downloads\BRICK_TE.bmp">
       <Filter>Source Files</Filter>
     </Image>
   </ItemGroup>

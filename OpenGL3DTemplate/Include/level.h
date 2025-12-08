@@ -21,13 +21,14 @@ public:
 	std::vector<Wall> walls;
 
     // Animation Variables
-    float rotationAngle; // 0 to 360 degrees
+    float rotationAngle; // 0 to 360 degrees - used for door rotation
     float hoverTime;     // Used for the bobbing up/down effect
     int checkCoinCollisions(float playerX, float playerZ, float playerRadius);
     Level();
     void loadAssets();
     void update(float deltaTime); // Calculates new angle/height
     void draw();
+    void drawDoor(Model_3DS& doorModel, float x, float y, float z); // Draw rotating door
     void addWall(float x, float z);
 
     // Collision Check

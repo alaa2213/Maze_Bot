@@ -308,13 +308,8 @@ void display() {
         }
     }
 
-    // 4. DRAW THE DOOR - at the end of the maze (north end)
-    if (doorModel.visible && doorModel.numObjects > 0) {
-        glPushMatrix();
-        glTranslatef(0.0f, 0.0f, 11.0f); // At the end of the maze (north end, z = 11)
-        doorModel.Draw();
-        glPopMatrix();
-    }
+    // 4. DRAW THE DOOR - at the end of the maze (north end) with rotation
+    level.drawDoor(doorModel, 0.0f, 0.0f, 11.0f);
 
     // Draw player - only if model loaded successfully
     if (!camera.isFirstPerson && robocopModel.visible && robocopModel.numObjects > 0) {
@@ -350,6 +345,13 @@ void reshape(int w, int h) {
 void timer(int val) {
     player.updatePhysics();
     int coinsFound = level.checkCoinCollisions(player.x, player.z, 0.5f);
+    
+    // Update score when coins are collected
+    if (coinsFound > 0) {
+        game.handleInteraction("coin");
+        std::cout << "Collected " << coinsFound << " coin(s)!" << std::endl;
+    }
+    
     level.update(0.016f);
     glutPostRedisplay();
 

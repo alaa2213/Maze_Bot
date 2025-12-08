@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\..\Downloads\wall (2).3ds" />
     <None Include="door.3DS" />
     <None Include="ReadMe.txt" />
     <None Include="robocop.3ds" />
@@ -108,7 +109,8 @@
     <Library Include="freeglut.lib" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Marble_W.bmp" />
+    <Image Include="..\..\Downloads\a930b1cae0753d21f0ac715976d2b8c0\Marble_W.bmp" />
+    <Image Include="..\..\Downloads\BRICK_TE.bmp" />
     <Image Include="RoboCop Toy 051023.bmp" />
     <Image Include="sandston.bmp" />
     <Image Include="sandstone bump.bmp" />
