@@ -25,6 +25,7 @@ public:
 
     // Collision Logic
     bool checkCollision(float wallX, float wallZ, float wallWidth, float wallDepth);
+    bool checkDamageCollision(float wallX, float wallZ, float wallWidth, float wallDepth); // NEW: Check for damage-causing collision
 
     // Getters
     float getX(); float getY(); float getZ();

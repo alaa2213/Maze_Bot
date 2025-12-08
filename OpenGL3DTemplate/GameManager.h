@@ -32,6 +32,8 @@ public:
 
     // Getters if needed by other members
     bool isPlaying();
+    bool hasWon(); // Check if player won
+    bool hasLost(); // Check if player lost
 };
 
 #endif
