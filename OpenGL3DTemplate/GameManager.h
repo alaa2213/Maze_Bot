@@ -14,8 +14,9 @@ private:
     bool isGameOver;
     bool isGameWon;
 
-    // For Light Animation
+    // For Light Animation in Level 2
     float lightAngle;
+    float movingLightPos; // Position for the back-and-forth light
 
 public:
     // Constructor

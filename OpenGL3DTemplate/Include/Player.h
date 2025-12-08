@@ -8,7 +8,8 @@ public:
     // Physics
     float velocityY; // For jumping
     bool isJumping;
-    int lives;       // Start with 5 [cite: 10]
+    int lives;       // Start with 5
+    bool canMove;    // Controls if player can move
 
     Player();
 
@@ -23,10 +24,12 @@ public:
     void updatePhysics();
 
     // Collision Logic
-    // Takes the coordinates of a wall to check if we hit it
     bool checkCollision(float wallX, float wallZ, float wallWidth, float wallDepth);
 
-    // Getters for Camera to use
+    // Getters
     float getX(); float getY(); float getZ();
-	void loseLife(); // Deduct a life
+    void loseLife(); // Deduct a life
+    void freezeMovement(); // Disable movement
+    void rotateTowards(float targetAngle, float rotationSpeed); // Smooth rotation
+    bool hasLives(); // Check if player still has lives
 };

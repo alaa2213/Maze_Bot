@@ -1,5 +1,6 @@
 #include "GLTexture.h"
 #include <stdio.h>
+#include <string.h>
 
 GLTexture::GLTexture() {
     texture[0] = 0;
@@ -26,12 +27,25 @@ void GLTexture::BuildColorTexture(unsigned char r, unsigned char g, unsigned cha
 }
 
 void GLTexture::Load(char* name) {
+    // Create a modifiable copy of the filename
+    char filename[256];
+    strncpy_s(filename, sizeof(filename), name, _TRUNCATE);
+    
+    // *** FIX: Replace .jpg/.jpeg extension with .bmp ***
+    char* extension = strrchr(filename, '.');
+    if (extension != NULL && (_stricmp(extension, ".jpg") == 0 || _stricmp(extension, ".jpeg") == 0)) {
+        strcpy(extension, ".bmp");
+        printf("INFO: Converting texture reference from JPG to BMP: %s -> %s\n", name, filename);
+    }
+    
     // 1. Use Windows API to load the BMP (No Glaux needed!)
     // We use LoadImageA to explicitly force ANSI mode, fixing your character set error
-    HBITMAP hBitmap = (HBITMAP)LoadImageA(NULL, name, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+    HBITMAP hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
     if (hBitmap == NULL) {
-        printf("ERROR: Could not load texture: %s\n", name);
+        printf("WARNING: Could not load texture: %s\n", filename);
+        printf("         Make sure the BMP file exists in the correct directory.\n");
+        texture[0] = 0; // Ensure texture ID is 0 so we can detect failure
         return;
     }
 
@@ -49,4 +63,6 @@ void GLTexture::Load(char* name) {
     gluBuild2DMipmaps(GL_TEXTURE_2D, 3, bmp.bmWidth, bmp.bmHeight, GL_BGR_EXT, GL_UNSIGNED_BYTE, bmp.bmBits);
 
     DeleteObject(hBitmap);
+    
+    printf("SUCCESS: Loaded texture: %s\n", filename);
 }

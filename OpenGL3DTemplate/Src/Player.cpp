@@ -15,43 +15,52 @@ Player::Player() {
     velocityY = 0.0f;
     isJumping = false;
     lives = 5; // [cite: 10] Player starts with 5 lives
+    canMove = true; // NEW: Player can move initially
 }
 
 // --- Movement Logic [cite: 30] ---
 
 void Player::moveForward() {
+    if (!canMove) return; // NEW: Block movement if disabled
+
     // Move "Forward" relative to where the player is facing
     // We update x and z based on the angle
-    float speed = 0.1f;
+    float speed = 0.3f; // INCREASED from 0.1f to 0.3f (3x faster!)
     x += speed * sin(DEG2RAD(angle));
     z += speed * cos(DEG2RAD(angle));
 }
 
 void Player::moveBackward() {
-    float speed = 0.1f;
+    if (!canMove) return; // NEW: Block movement if disabled
+
+    float speed = 0.3f; // INCREASED from 0.1f to 0.3f (3x faster!)
     x -= speed * sin(DEG2RAD(angle));
     z -= speed * cos(DEG2RAD(angle));
 }
 
 void Player::turnLeft() {
+    if (!canMove) return; // NEW: Block movement if disabled
+
     // Rotate left
     float rotateSpeed = 5.0f;
     angle += rotateSpeed;
 
     // Move forward in the new direction
-    float speed = 0.1f;
+    float speed = 0.3f; // INCREASED from 0.1f to 0.3f (3x faster!)
     x += speed * sin(DEG2RAD(angle));
     z += speed * cos(DEG2RAD(angle));
 }
 
 
 void Player::turnRight() {
+    if (!canMove) return; // NEW: Block movement if disabled
+
     // Rotate right
     float rotateSpeed = 5.0f;
     angle -= rotateSpeed;
 
     // Move forward in the new direction
-    float speed = 0.1f;
+    float speed = 0.3f; // INCREASED from 0.1f to 0.3f (3x faster!)
     x += speed * sin(DEG2RAD(angle));
     z += speed * cos(DEG2RAD(angle));
 }
@@ -59,6 +68,8 @@ void Player::turnRight() {
 // --- Jumping & Gravity Logic [cite: 31] ---
 
 void Player::jump() {
+    if (!canMove) return; // NEW: Block jumping if disabled
+
     // Only jump if we are currently on the ground
     if (!isJumping) {
         velocityY = 0.2f; // Initial jump force
@@ -113,4 +124,39 @@ void Player::loseLife() {
         // x = ...
         std::cout << "Ouch! Lives remaining: " << lives << std::endl;
     }
+}
+
+// NEW: Freeze player movement
+void Player::freezeMovement() {
+    canMove = false;
+}
+
+// NEW: Smooth rotation towards target angle
+void Player::rotateTowards(float targetAngle, float rotationSpeed) {
+    // Calculate the shortest rotation direction
+    float angleDiff = targetAngle - angle;
+    
+    // Normalize to -180 to 180 range
+    while (angleDiff > 180.0f) angleDiff -= 360.0f;
+    while (angleDiff < -180.0f) angleDiff += 360.0f;
+    
+    // Rotate towards target
+    if (abs(angleDiff) > rotationSpeed) {
+        if (angleDiff > 0) {
+            angle += rotationSpeed;
+        } else {
+            angle -= rotationSpeed;
+        }
+    } else {
+        angle = targetAngle; // Snap to target when close enough
+    }
+    
+    // Keep angle in 0-360 range
+    while (angle >= 360.0f) angle -= 360.0f;
+    while (angle < 0.0f) angle += 360.0f;
+}
+
+// NEW: Check if player has lives remaining
+bool Player::hasLives() {
+    return lives > 0;
 }
